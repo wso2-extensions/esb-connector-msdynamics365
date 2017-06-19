@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~    http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<template name="init" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="accessToken"
+               description="The value of the Access Token to access the MicrosoftDynamicCRM Web API via request."/>
+    <parameter name="apiUrl" description="The instance URL for your organization."/>
+    <parameter name="apiVersion" description="The api version of the MicrosoftDynamicCRM Web API."/>
+    <parameter name="refreshToken" description="The value of the refresh token."/>
+    <parameter name="clientSecret"
+               description="The client secret of the client application that is registered in Azure AD."/>
+    <parameter name="clientId"
+               description="The client ID of the client application that is registered in Azure AD."/>
+    <parameter name="resource"
+               description="The App ID URI of the web API."/>
+    <parameter name="registryPath"
+               description="Registry Path of the Connector where the values are stored."/>
+    <parameter name="intervalTime" description="The Interval time is to check the accessToken validity."/>
+
+    <sequence>
+        <property name="msdynamics365.accessToken" expression="$func:accessToken"/>
+        <property name="uri.var.msdynamics365.apiUrl" expression="$func:apiUrl"/>
+        <property name="uri.var.msdynamics365.apiVersion" expression="$func:apiVersion"/>
+        <property name="msdynamics365.refreshToken" expression="$func:refreshToken"/>
+        <property name="msdynamics365.clientSecret" expression="$func:clientSecret"/>
+        <property name="msdynamics365.clientId" expression="$func:clientId"/>
+        <property name="msdynamics365.resource" expression="$func:resource"/>
+        <property name="msdynamics365.registryPath" expression="$func:registryPath"/>
+        <property name="msdynamics365.intervalTime" expression="$func:intervalTime"/>
+
+        <filter source="boolean($ctx:msdynamics365.refreshToken) and boolean($ctx:msdynamics365.clientSecret) and
+         boolean($ctx:msdynamics365.clientId) and boolean($ctx:msdynamics365.accessToken) and 
+         boolean($ctx:msdynamics365.resource)" regex="true">
+            <then>
+                <filter source="boolean($ctx:msdynamics365.intervalTime)" regex="false">
+                    <then>
+                        <property name="msdynamics365.intervalTime" value="3000000"/>
+                    </then>
+                </filter>
+                <filter source="boolean($ctx:msdynamics365.registryPath)" regex="false">
+                    <then>
+                        <property name="msdynamics365.accessTokenRegistryPath"
+                                  value="connectors/msDynamics365/accessToken"/>
+                        <property name="msdynamics365.refreshTokenRegistryPath"
+                                  value="connectors/msDynamics365/refreshToken"/>
+                        <property name="msdynamics365.timeRegistryPath"
+                                  value="connectors/msDynamics365/time"/>
+                    </then>
+                    <else>
+                        <property name="msdynamics365.accessTokenRegistryPath"
+                                  expression="fn:concat($ctx:msdynamics365.registryPath, '/accessToken' )"/>
+                        <property name="msdynamics365.refreshTokenRegistryPath"
+                                  expression="fn:concat($ctx:msdynamics365.registryPath, '/refreshToken' )"/>
+                        <property name="msdynamics365.timeRegistryPath"
+                                  expression="fn:concat($ctx:msdynamics365.registryPath, '/time' )"/>
+                    </else>
+                </filter>
+                <property name="msdynamics365.accessTokenFromRegistry"
+                          expression="get-property('registry', $ctx:msdynamics365.accessTokenRegistryPath)"/>
+                <property name="msdynamics365.refreshTokenFromRegistry"
+                          expression="get-property('registry', $ctx:msdynamics365.refreshTokenRegistryPath)"/>
+                <property name="msdynamics365.systemTime" expression="get-property('SYSTEM_TIME')" scope="default"/>
+
+                <filter source="$ctx:msdynamics365.accessTokenFromRegistry='' and
+                $ctx:msdynamics365.refreshTokenFromRegistry=''" regex="false">
+                    <then>
+                        <property name="msdynamics365.accessToken"
+                                  expression="$ctx:msdynamics365.accessTokenFromRegistry"/>
+                        <property name="msdynamics365.refreshToken"
+                                  expression="$ctx:msdynamics365.refreshTokenFromRegistry"/>
+                    </then>
+                </filter>
+                <filter source="$ctx:msdynamics365.accessTokenFromRegistry=''" regex="true">
+                    <then>
+                        <script language="js">
+                            <![CDATA[
+                           importPackage(Packages.org.apache.synapse.config);
+                           var newAccess = mc.getProperty('msdynamics365.accessToken');
+                           var newRefresh = mc.getProperty('msdynamics365.refreshToken');
+                           var newAccessRegistryPath = mc.getProperty('msdynamics365.accessTokenRegistryPath');
+                           var newRefreshRegistryPath = mc.getProperty('msdynamics365.refreshTokenRegistryPath');
+                           var newSysTime = mc.getProperty('msdynamics365.systemTime');
+                           var newTimeRegistryPath = mc.getProperty('msdynamics365.timeRegistryPath');
+                           if(newAccess != null && newAccess != '' && newRefresh != null && newRefresh != '' ){
+                               //Create the registry entry if no such entry exists.
+                               mc.getConfiguration().getRegistry().newResource(newAccessRegistryPath,false);
+                               mc.getConfiguration().getRegistry().updateResource(newAccessRegistryPath,newAccess);
+                               mc.getConfiguration().getRegistry().newResource(newRefreshRegistryPath,false);
+                               mc.getConfiguration().getRegistry().updateResource(newRefreshRegistryPath,newRefresh);
+                               mc.getConfiguration().getRegistry().newResource(newTimeRegistryPath, false);
+                               mc.getConfiguration().getRegistry().updateResource(newTimeRegistryPath, newSysTime);
+                           }
+                           ]]>
+                        </script>
+                    </then>
+                </filter>
+                <property name="msdynamics365.registryTime"
+                          expression="get-property('registry', $ctx:msdynamics365.timeRegistryPath)"/>
+                <script language="js"><![CDATA[
+                    var currentTime = mc.getProperty("msdynamics365.systemTime");
+                    var updatedTimeInRegistry= mc.getProperty("msdynamics365.registryTime");
+                    var intervalTime = currentTime - updatedTimeInRegistry;
+                    mc.setProperty("msdynamics365.INTERVAL_TIME", intervalTime);
+                   ]]>
+                </script>
+                <!--If the access token is not in the registry(first call) or time interval less than 50 minutes ,
+                 then get a new access token by calling getAccessTokenFromRefreshToken method and store the time into
+                 registry-->
+                <filter source="$ctx:msdynamics365.INTERVAL_TIME &gt;$ctx:msdynamics365.intervalTime or
+                $ctx:msdynamics365.accessToken=''" regex="true">
+                    <then>
+                        <msdynamics365.getAccessTokenFromRefreshToken/>
+                    </then>
+                </filter>
+            </then>
+        </filter>
+        <filter source="boolean($ctx:uri.var.msdynamics365.apiVersion)" regex="false">
+            <then>
+                <property name="uri.var.msdynamics365.apiVersion" value="v8.2"/>
+            </then>
+        </filter>
+        <header name="Authorization" expression="fn:concat('Bearer ', $ctx:msdynamics365.accessToken )"
+                scope="transport"/>
+    </sequence>
+</template>
