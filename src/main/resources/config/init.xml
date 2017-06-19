@@ -31,7 +31,6 @@
     <parameter name="registryPath"
                description="Registry Path of the Connector where the values are stored."/>
     <parameter name="intervalTime" description="The Interval time is to check the accessToken validity."/>
-
     <sequence>
         <property name="msdynamics365.accessToken" expression="$func:accessToken"/>
         <property name="uri.var.msdynamics365.apiUrl" expression="$func:apiUrl"/>

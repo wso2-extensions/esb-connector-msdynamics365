@@ -53,7 +53,7 @@
                 <call>
                     <endpoint>
                         <http method="POST"
-                              uri-template="legacy-encoding:{uri.var.msdynamics365.apiUrl}/api/data/{uri.var.msdynamics365.apiVersion}/{uri.var.entityType}({+uri.var.primaryKeyValue})/{+uri.var.navigationPropertyValue}/$ref"/>
+                              uri-template="legacy-encoding:{uri.var.msdynamics365.apiUrl}/api/data/{uri.var.msdynamics365.apiVersion}/{uri.var.entityType}({uri.var.primaryKeyValue})/{uri.var.navigationPropertyValue}/$ref"/>
                     </endpoint>
                 </call>
             </then>
@@ -61,7 +61,7 @@
                 <call>
                     <endpoint>
                         <http method="PUT"
-                              uri-template="legacy-encoding:{uri.var.msdynamics365.apiUrl}/api/data/{uri.var.msdynamics365.apiVersion}/{uri.var.entityType}({+uri.var.primaryKeyValue})/{+uri.var.navigationPropertyValue}/$ref"/>
+                              uri-template="legacy-encoding:{uri.var.msdynamics365.apiUrl}/api/data/{uri.var.msdynamics365.apiVersion}/{uri.var.entityType}({uri.var.primaryKeyValue})/{uri.var.navigationPropertyValue}/$ref"/>
                     </endpoint>
                 </call>
             </else>
