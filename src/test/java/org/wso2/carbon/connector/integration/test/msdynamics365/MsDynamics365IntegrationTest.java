@@ -42,7 +42,7 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
      */
     @BeforeClass(alwaysRun = true)
     public void setEnvironment() throws Exception {
-        init("msdynamics365-connector-1.0.0");
+        init("msdynamics365-connector-1.0.1-SNAPSHOT");
 
         esbRequestHeadersMap.put("Content-Type", "application/json");
         esbRequestHeadersMap.put("Accept", "application/json");
