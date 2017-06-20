@@ -22,7 +22,7 @@
     <groupId>org.wso2.carbon.connector</groupId>
     <artifactId>org.wso2.carbon.connector.msdynamics365</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>WSO2 Carbon - Connector For Microsoft Dynamics CRM</name>
     <url>http://wso2.org</url>
     <properties>
