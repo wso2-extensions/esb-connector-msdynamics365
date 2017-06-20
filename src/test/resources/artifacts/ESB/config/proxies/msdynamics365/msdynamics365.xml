@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~  WSO2 Inc. licenses this file to you under the Apache License,
+ ~  Version 2.0 (the "License"); you may not use this file except
+ ~  in compliance with the License.
+ ~  You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~  Unless required by applicable law or agreed to in writing,
+ ~  software distributed under the License is distributed on an
+ ~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~  KIND, either express or implied.  See the License for the
+ ~  specific language governing permissions and limitations
+ ~  under the License.
+-->
+
+<proxy xmlns="http://ws.apache.org/ns/synapse"
+       name="msdynamics365"
+       startOnLoad="true"
+       statistics="disable"
+       trace="disable"
+       transports="http">
+    <target>
+        <inSequence>
+            <property expression="json-eval($.apiUrl)" name="apiUrl"/>
+            <property expression="json-eval($.accessToken)" name="accessToken"/>
+            <property expression="json-eval($.entityType)" name="entityType"/>
+            <property expression="json-eval($.bodyContent)" name="bodyContent"/>
+            <property expression="json-eval($.apiVersion)" name="apiVersion"/>
+            <property expression="json-eval($.refreshToken)" name="refreshToken"/>
+            <property expression="json-eval($.clientSecret)" name="clientSecret"/>
+            <property expression="json-eval($.clientId)" name="clientId"/>
+            <property expression="json-eval($.resource)" name="resource"/>
+            <property expression="json-eval($.registryPath)" name="registryPath"/>
+            <property expression="json-eval($.intervalTime)" name="intervalTime"/>
+            <property expression="json-eval($.queryParam)" name="queryParam"/>
+            <property expression="json-eval($.primaryKeyValue)" name="primaryKeyValue"/>
+            <property expression="json-eval($.singlePropertyName)" name="singlePropertyName"/>
+            <property expression="json-eval($.primaryKeyValueOrAlternateKey)" name="primaryKeyValueOrAlternateKey"/>
+            <property expression="json-eval($.navigationPropertyValue)" name="navigationPropertyValue"/>
+            <property expression="json-eval($.referenceOrCountOfEntity)" name="referenceOrCountOfEntity"/>
+            <property expression="json-eval($.useCollectionValuedNavigationProperty)"
+                      name="useCollectionValuedNavigationProperty"/>
+            <property expression="json-eval($.primaryKeyValueOfFirstEntity)" name="primaryKeyValueOfFirstEntity"/>
+            <property expression="json-eval($.primaryKeyValueOfSecondEntity)" name="primaryKeyValueOfSecondEntity"/>
+            <property expression="json-eval($.preventCreateInUpsert)" name="preventCreateInUpsert"/>
+            <property expression="$trp:Action" name="transportAction"/>
+            <msdynamics365.init>
+                <apiUrl>{$ctx:apiUrl}</apiUrl>
+                <accessToken>{$ctx:accessToken}</accessToken>
+                <apiVersion>{$ctx:apiVersion}</apiVersion>
+                <refreshToken>{$ctx:refreshToken}</refreshToken>
+                <clientSecret>{$ctx:clientSecret}</clientSecret>
+                <clientId>{$ctx:clientId}</clientId>
+                <resource>{$ctx:resource}</resource>
+                <registryPath>{$ctx:registryPath}</registryPath>
+                <intervalTime>{$ctx:intervalTime}</intervalTime>
+            </msdynamics365.init>
+            <switch source="get-property('transportAction')">
+                <case regex="urn:createEntity">
+                    <msdynamics365.createEntity>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <bodyContent>{$ctx:bodyContent}</bodyContent>
+                        <queryParam>{$ctx:queryParam}</queryParam>
+                    </msdynamics365.createEntity>
+                </case>
+                <case regex="urn:deleteEntity">
+                    <msdynamics365.deleteEntity>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                    </msdynamics365.deleteEntity>
+                </case>
+                <case regex="urn:deleteSinglePropertyValue">
+                    <msdynamics365.deleteSinglePropertyValue>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <singlePropertyName>{$ctx:singlePropertyName}</singlePropertyName>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                    </msdynamics365.deleteSinglePropertyValue>
+                </case>
+                <case regex="urn:retrieveByExpandingNavigationProperties">
+                    <msdynamics365.retrieveByExpandingNavigationProperties>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <queryParam>{$ctx:queryParam}</queryParam>
+                    </msdynamics365.retrieveByExpandingNavigationProperties>
+                </case>
+                <case regex="urn:retrieveEntity">
+                    <msdynamics365.retrieveEntity>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValueOrAlternateKey>{$ctx:primaryKeyValueOrAlternateKey}</primaryKeyValueOrAlternateKey>
+                    </msdynamics365.retrieveEntity>
+                </case>
+                <case regex="urn:retrieveNavigationPropertyValues">
+                    <msdynamics365.retrieveNavigationPropertyValues>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <navigationPropertyValue>{$ctx:navigationPropertyValue}</navigationPropertyValue>
+                        <referenceOrCountOfEntity>{$ctx:referenceOrCountOfEntity}</referenceOrCountOfEntity>
+                        <queryParam>{$ctx:queryParam}</queryParam>
+                    </msdynamics365.retrieveNavigationPropertyValues>
+                </case>
+                <case regex="urn:retrieveSingleProperty">
+                    <msdynamics365.retrieveSingleProperty>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <singlePropertyName>{$ctx:singlePropertyName}</singlePropertyName>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                    </msdynamics365.retrieveSingleProperty>
+                </case>
+                <case regex="urn:retrieveSpecificProperties">
+                    <msdynamics365.retrieveSpecificProperties>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <queryParam>{$ctx:queryParam}</queryParam>
+                    </msdynamics365.retrieveSpecificProperties>
+                </case>
+                <case regex="urn:updateEntity">
+                    <msdynamics365.updateEntity>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <bodyContent>{$ctx:bodyContent}</bodyContent>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                    </msdynamics365.updateEntity>
+                </case>
+                <case regex="urn:upsertEntity">
+                    <msdynamics365.upsertEntity>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <bodyContent>{$ctx:bodyContent}</bodyContent>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <preventCreateInUpsert>{$ctx:preventCreateInUpsert}</preventCreateInUpsert>
+                    </msdynamics365.upsertEntity>
+                </case>
+                <case regex="urn:updateEntityWithDataReturnedOrSinglePropertyValue">
+                    <msdynamics365.updateEntityWithDataReturnedOrSinglePropertyValue>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <bodyContent>{$ctx:bodyContent}</bodyContent>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <queryParam>{$ctx:queryParam}</queryParam>
+                        <singlePropertyName>{$ctx:singlePropertyName}</singlePropertyName>
+                    </msdynamics365.updateEntityWithDataReturnedOrSinglePropertyValue>
+                </case>
+                <case regex="urn:associateAnExistingEntity">
+                    <msdynamics365.associateAnExistingEntity>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <bodyContent>{$ctx:bodyContent}</bodyContent>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <navigationPropertyValue>{$ctx:navigationPropertyValue}</navigationPropertyValue>
+                        <useCollectionValuedNavigationProperty>{$ctx:useCollectionValuedNavigationProperty}</useCollectionValuedNavigationProperty>
+                    </msdynamics365.associateAnExistingEntity>
+                </case>
+                <case regex="urn:removeEntityReferenceForCollectionValuedProperty">
+                    <msdynamics365.removeEntityReferenceForCollectionValuedProperty>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValueOfFirstEntity>{$ctx:primaryKeyValueOfFirstEntity}</primaryKeyValueOfFirstEntity>
+                        <primaryKeyValueOfSecondEntity>{$ctx:primaryKeyValueOfSecondEntity}</primaryKeyValueOfSecondEntity>
+                        <navigationPropertyValue>{$ctx:navigationPropertyValue}</navigationPropertyValue>
+                        <queryParam>{$ctx:queryParam}</queryParam>
+                    </msdynamics365.removeEntityReferenceForCollectionValuedProperty>
+                </case>
+                <case regex="urn:removeEntityReferenceForSingleValuedProperty">
+                    <msdynamics365.removeEntityReferenceForSingleValuedProperty>
+                        <entityType>{$ctx:entityType}</entityType>
+                        <primaryKeyValue>{$ctx:primaryKeyValue}</primaryKeyValue>
+                        <navigationPropertyValue>{$ctx:navigationPropertyValue}</navigationPropertyValue>
+                    </msdynamics365.removeEntityReferenceForSingleValuedProperty>
+                </case>
+            </switch>
+            <respond/>
+        </inSequence>
+    </target>
+    <description/>
+</proxy>

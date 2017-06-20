@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~  Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~
+~  WSO2 Inc. licenses this file to you under the Apache License,
+~  Version 2.0 (the "License"); you may not use this file except
+~  in compliance with the License.
+~  You may obtain a copy of the License at
+~
+~    http://www.apache.org/licenses/LICENSE-2.0
+~
+~  Unless required by applicable law or agreed to in writing,
+~  software distributed under the License is distributed on an
+~  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~  KIND, either express or implied.  See the License for the
+~  specific language governing permissions and limitations
+~  under the License.
+-->
+
+<template name="updateEntity" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="entityType" description="The type of the entity to update it."/>
+    <parameter name="bodyContent" description="The required body content to update the specific entity."/>
+    <parameter name="primaryKeyValue" description="The primary key value of an entity type to update the data."/>
+    <sequence>
+        <property name="uri.var.entityType" expression="$func:entityType"/>
+        <property name="bodyContent" expression="$func:bodyContent"/>
+        <property name="uri.var.primaryKeyValue" expression="$func:primaryKeyValue"/>
+        <property name="messageType" value="application/json" scope="axis2"/>
+        <payloadFactory media-type="json">
+            <format>
+                $1
+            </format>
+            <args>
+                <arg expression="$ctx:bodyContent"/>
+            </args>
+        </payloadFactory>
+        <property name="DISABLE_CHUNKING" value="true" scope="axis2"/>
+        <call>
+            <endpoint>
+                <http method="PATCH"
+                      uri-template="{uri.var.msdynamics365.apiUrl}/api/data/{uri.var.msdynamics365.apiVersion}/{uri.var.entityType}({+uri.var.primaryKeyValue})"/>
+            </endpoint>
+        </call>
+    </sequence>
+</template>

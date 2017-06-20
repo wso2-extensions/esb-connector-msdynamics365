@@ -1,0 +1,13 @@
+{
+  "apiUrl":"%s(apiUrl)",
+  "apiVersion":"%s(apiVersion)",
+  "refreshToken":"%s(refreshToken)",
+  "clientSecret":"%s(clientSecret)",
+  "clientId":"%s(clientId)",
+  "resource":"%s(resource)",
+  "registryPath":"%s(registryPath)",
+  "intervalTime":"%s(intervalTime)",
+  "accessToken":"%s(accessToken)",
+  "entityType":"%s(entityType)",
+  "primaryKeyValueOrAlternateKey":"f9d858aa-864e-e711-80f8-c4346bad2694"
+}
