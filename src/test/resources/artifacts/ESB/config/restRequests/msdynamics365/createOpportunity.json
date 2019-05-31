@@ -8,8 +8,6 @@
   "registryPath":"%s(registryPath)",
   "intervalTime":"%s(intervalTime)",
   "accessToken":"%s(accessToken)",
-  "entityType":"%s(entityType)",
-  "bodyContent":%s(updateSinglePropertyValue),
-  "primaryKeyValue":"%s(primaryKey)",
-  "singlePropertyName":"%s(singlePropertyName)"
+  "entityType":"opportunities",
+  "bodyContent":{"name": "NewAccount123"}
 }

@@ -1,0 +1,1 @@
+client_id=%s(clientId)&client_secret=%s(clientSecret)&grant_type=refresh_token&resource=%s(resourceUrlEncoded)&refresh_token=%s(refreshToken)

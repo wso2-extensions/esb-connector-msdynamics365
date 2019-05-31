@@ -42,10 +42,29 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
      */
     @BeforeClass(alwaysRun = true)
     public void setEnvironment() throws Exception {
-        init("msdynamics365-connector-1.0.1-SNAPSHOT");
+
+        String connectorName = System.getProperty("connector_name") + "-connector-" +
+                System.getProperty("connector_version") + ".zip";
+        init(connectorName);
+        getApiConfigProperties();
+        getAccessToken();
 
         esbRequestHeadersMap.put("Content-Type", "application/json");
         esbRequestHeadersMap.put("Accept", "application/json");
+    }
+
+    private void getAccessToken() throws IOException, JSONException {
+
+        Map<String, String> apiTokenRequestHeadersMap = new HashMap<String, String>();
+        Map<String, String> apiParametersMap = new HashMap<String, String>();
+        apiTokenRequestHeadersMap.put("Content-Type", "application/x-www-form-urlencoded");
+        RestResponse<JSONObject> apiTokenRestResponse =
+                sendJsonRestRequest(connectorProperties.getProperty("loginEndpoint") +
+                                "/common/oauth2/token", "POST",
+                        apiTokenRequestHeadersMap, "tokenRequest.txt", apiParametersMap);
+
+        String accessToken = apiTokenRestResponse.getBody().get("access_token").toString();
+        connectorProperties.put("accessToken",accessToken);
     }
 
     /**
@@ -69,6 +88,15 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
             description = "msdynamics365 {associateEntitiesOnCreate} integration test with mandatory parameters.")
     public void testAssociateEntitiesOnCreateWithMandatoryParameters() throws IOException, JSONException {
         esbRequestHeadersMap.put("Action", "urn:createEntity");
+
+        RestResponse<JSONObject> esbRestContactResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "createContact.json");
+
+        String entityId = esbRestContactResponse.getHeadersMap().get("OData-EntityId").toString();
+        String contactId = entityId.substring(entityId.indexOf('(') + 1, entityId.indexOf(')'));
+
+        connectorProperties.setProperty("bodyContentForAssociateEntityOnCreate",
+                connectorProperties.getProperty("bodyContentForAssociateEntityOnCreate").replace("<id>", contactId));
 
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap,
@@ -173,6 +201,24 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
     @Test(enabled = true, priority = 9,
             description = "msdynamics365 {associateEntitiesOnUpdate} integration test with mandatory parameters.")
     public void testAssociateEntitiesOnUpdateWithMandatoryParameters() throws IOException, JSONException {
+        esbRequestHeadersMap.put("Action", "urn:createEntity");
+
+        RestResponse<JSONObject> esbRestAccountResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "createAccount.json");
+
+        String entityId = esbRestAccountResponse.getHeadersMap().get("OData-EntityId").toString();
+        String accountId = entityId.substring(entityId.indexOf('(') + 1, entityId.indexOf(')'));
+        connectorProperties.setProperty("primaryKey", accountId);
+        connectorProperties.setProperty("primaryKeyForRetrieveNavigationProperties", accountId);
+
+        String content = connectorProperties.getProperty("bodyContentForAssociateOnUpdate").replace("<id>", accountId);
+        content = content.replace("<resource>", connectorProperties.getProperty("resource"));
+        connectorProperties.setProperty("bodyContentForAssociateOnUpdate", content);
+
+        content = connectorProperties.getProperty("contentForAssociateWithSingleValued").replace("<id>", accountId);
+        content = content.replace("<resource>", connectorProperties.getProperty("resource"));
+        connectorProperties.setProperty("contentForAssociateWithSingleValued", content);
+
         esbRequestHeadersMap.put("Action", "urn:updateEntity");
 
         RestResponse<JSONObject> esbRestResponse =
@@ -237,8 +283,8 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap,
                         "updateSinglePropertyValue_negative.json");
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("error").getString("message"),
-                "Request message has unresolved parameters.");
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 404);
+
     }
 
     /**
@@ -359,8 +405,9 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap,
                         "retrieveSingleProperty_negative.json");
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("error").getString("message"),
-                "Request message has unresolved parameters.");
+
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 404);
+
     }
 
     /**
@@ -422,8 +469,9 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
         RestResponse<JSONObject> esbRestResponse =
                 sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap,
                         "retrieveSingleValuedNavigationProperties_negative.json");
-        Assert.assertEquals(esbRestResponse.getBody().getJSONObject("error").getString("message"),
-                "Request message has unresolved parameters.");
+
+        Assert.assertEquals(esbRestResponse.getHttpStatusCode(), 404);
+
     }
 
     /**
@@ -467,6 +515,25 @@ public class MsDynamics365IntegrationTest extends ConnectorIntegrationTestBase {
                     "integration test with mandatory parameters.")
     public void testAssociateAnEntityToCollectionValuedPropertyWithMandatoryParameters()
             throws IOException, JSONException {
+
+        esbRequestHeadersMap.put("Action", "urn:createEntity");
+
+        RestResponse<JSONObject> esbRestAccountResponse =
+                sendJsonRestRequest(proxyUrl, "POST", esbRequestHeadersMap, "createOpportunity.json");
+
+        String entityId = esbRestAccountResponse.getHeadersMap().get("OData-EntityId").toString();
+        String opportunityId = entityId.substring(entityId.indexOf('(') + 1, entityId.indexOf(')'));
+
+        connectorProperties.setProperty("primaryKeyValueForAssociation", opportunityId);
+
+        String content = connectorProperties.getProperty("bodyContentForAssociation").replace("<id>", opportunityId);
+        content = content.replace("<resource>", connectorProperties.getProperty("resource"));
+        connectorProperties.setProperty("bodyContentForAssociation", content);
+
+        content = connectorProperties.getProperty("queryParamForRemoveReference").replace("<id>", opportunityId);
+        content = content.replace("<resource>", connectorProperties.getProperty("resource"));
+        connectorProperties.setProperty("queryParamForRemoveReference", content);
+
         esbRequestHeadersMap.put("Action", "urn:associateAnExistingEntity");
 
         RestResponse<JSONObject> esbRestResponse =
