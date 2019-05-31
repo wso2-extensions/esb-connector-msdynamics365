@@ -9,7 +9,5 @@
   "intervalTime":"%s(intervalTime)",
   "accessToken":"%s(accessToken)",
   "entityType":"%s(entityType)",
-  "bodyContent":%s(updateSinglePropertyValue),
-  "primaryKeyValue":"%s(primaryKey)",
-  "singlePropertyName":"%s(singlePropertyName)"
+  "bodyContent":{"name": "NewAccount123","primarycontactid":{"firstname": "John"},"creditonhold": false,"address1_latitude": 77.9583,"description": "Testing purpose","revenue": 7000000}
 }

@@ -1,4 +1,4 @@
-Product: WSO2 ESB Connector for Microsoft Dynamic CRM (Microsoft Dynamic 365) + Integration Tests
+Product: WSO2 EI Connector for Microsoft Dynamic CRM (Microsoft Dynamic 365) + Integration Tests
 
 Pre-requisites:
 
@@ -11,20 +11,19 @@ Pre-requisites:
 
 Tested Platform:
 
- - Microsoft WINDOWS V-7
- - UBUNTU 14.04, Mac OSx 10.9
- - WSO2 ESB 5.0.0 and the latest version (EI 6.1.1)
+ - UBUNTU 16.04
+ - WSO2 EI 6.5.0
 
 STEPS:
 
-1. Download ESB 5.0.0 from official website and extract the ESB and add "-XX:-UseSplitVerifier" under $JVM_MEM_OPTS into {ESB_HOME}/bin/wso2server.sh.
+1. Download EI from official website and extract the EI.
 
-2. The ESB should be configured as below;
+2. The EI should be configured as below;
    	Please make sure that the below mentioned Axis configurations are enabled (\repository\conf\axis2\axis2.xml).
 
-    <messageFormatter contentType="application/x-www-form-urlencoded"
+       <messageFormatter contentType="application/x-www-form-urlencoded"
                              class="org.apache.axis2.transport.http.XFormURLEncodedFormatter"/>
-   	<messageBuilder contentType="application/x-www-form-urlencoded"
+   	   <messageBuilder contentType="application/x-www-form-urlencoded"
                            class="org.apache.synapse.commons.builders.XFormURLEncodedBuilder"/>
 
    	Note: Add the above message formatter and the corresponding message builder only if they are not available in the axis configurations.
@@ -37,7 +36,7 @@ STEPS:
     2. To Register a Dynamics 365 app with Azure Active Directory , follow the link (https://msdn.microsoft.com/en-us/library/mt622431.aspx).
     3. Register a new application in the Azure classic portal.(Go to https://azure.microsoft.com/en-us/documentation/articles/active-directory-integrating-applications/#BKMK_Native).
 
-4. Update the property file at msdynamics365.properties found in  to "{msdynamics365_Connector_Home}/src/test/resources/artifacts/ESB/connector/config/" as follows.
+4. Update the property files esb-connector-msdynamics365.properties and msdynamics365.properties found in  to "{msdynamics365_Connector_Home}/src/test/resources/artifacts/ESB/connector/config/" as follows.
 
 
         apiUrl                                          - The instance URL for your organization.
@@ -77,6 +76,7 @@ STEPS:
         refOrCount                                      - To return references to an entity related to a specific entity by adding /$ref to the request. (possible values $ref or $count).
         queryParamForRetrieveSingleValuedProperty       - The required query param to retrieve data by using single valued navigation property.
         queryParamForRemoveReference                    - The query param for remove reference to an entity.
+        resourceUrlEncoded                              - The url encoded resource.
 
-5. Navigate to "{msdynamics365_Connector_Home}/" and run the following command.
-      $ mvn clean install
+5. Navigate to "{msdynamics365_Connector_Home}/" and run the following command.<br/>
+     ``` $ mvn clean install -Dskip-tests=false```
