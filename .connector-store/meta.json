@@ -6,5 +6,10 @@
     "description": "The Microsoft Dynamics 365 (Microsoft Dynamics CRM) Connector allows you to access the Microsoft Dynamics 365 Web API through WSO2 ESB. The Microsoft Dynamics CRM (Now it's known as Microsoft Dynamics 365) system is a standalone CRM product from Microsoft that provides Sales, Marketing and Service Management capabilities only via individual modules.",
     "status": "Active",
     "labels": [],
-    "releases": []
+    "releases": [
+        {
+            "tagName": "1.0.0",
+            "products": []
+        }
+    ]
 }
